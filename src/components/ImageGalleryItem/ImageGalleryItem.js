@@ -1,5 +1,6 @@
 import { ModalWindow } from 'components/Modal/Modal';
 import { Component } from 'react';
+import { StyledImage } from './ImageGalleryItem.styled';
 
 
 export class ImageGalleryItem extends Component {
@@ -12,11 +13,11 @@ export class ImageGalleryItem extends Component {
     closeModal = () => this.setState({ isModalOpen: false });
 
     render() {
-        const { image:{ largeImageURL, previewURL,tags }
+        const { image:{ largeImageURL, webformatURL,tags }
     } = this.props
         return (
             <>
-                <img onClick={this.openModal} src={previewURL} alt={tags} />
+                <StyledImage onClick={this.openModal} src={webformatURL} alt={tags} />
                 <ModalWindow closeModal={this.closeModal} src={largeImageURL} alt={tags} stateModal={this.state.isModalOpen} />
             </>
             

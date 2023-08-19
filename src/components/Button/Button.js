@@ -1,7 +1,9 @@
-export const Button = ({onButton}) => {
+import { StyledBtn } from "./Button.styled"
+
+export const Button = ({ onButton }) => {
     return (
-        <div>
-            <button onClick={onButton} type="button">Load more</button>
-        </div>
+        <>
+            <StyledBtn onClick={onButton} type="button">Load more</StyledBtn>
+        </>
     )
 }

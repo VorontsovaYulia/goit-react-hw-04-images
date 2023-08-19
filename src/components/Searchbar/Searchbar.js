@@ -1,4 +1,7 @@
-export const Searchbar = ({changeQuery}) => {
+import { ImSearch } from 'react-icons/im';
+import { StyledHeader, StyledForm, StyledButton, StyledInput } from "./Searchbar.styled";
+
+export const Searchbar = ({ changeQuery }) => {
    
     const handleSubmit = (evt) => {
         evt.preventDefault();
@@ -7,21 +10,21 @@ export const Searchbar = ({changeQuery}) => {
     }
 
         return (
-            <header>
-                <form onSubmit={handleSubmit}>
-                    <button type="submit">
-                        <span>Search</span>
-                    </button>
+            <StyledHeader>
+                <StyledForm onSubmit={handleSubmit}>
+                    <StyledButton type="submit">
+                        <ImSearch size={20} />
+                    </StyledButton>
 
-                    <input
+                    <StyledInput
                         name="query"
                         type="text"
                         // autocomplete="off"
                         // autofocus
                         placeholder="Search images and photos"
                     />
-                </form>
-            </header>
+                </StyledForm>
+            </StyledHeader>
         )
     
 }

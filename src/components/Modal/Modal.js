@@ -8,6 +8,9 @@ const customStyles = {
     bottom: 'auto',
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
+    },
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
 };
 
@@ -16,12 +19,13 @@ Modal.setAppElement('#root');
 export const ModalWindow = ({stateModal, closeModal, src, alt}) => {
 
     return (
-         <Modal
-        isOpen={stateModal}
-        onRequestClose={closeModal}
-        style={customStyles}
-      >
-      <img src={src} alt={alt} />
-      </Modal>
+        <Modal
+            isOpen={stateModal}
+            onRequestClose={closeModal}
+            style={customStyles}
+        >
+            <img src={src} alt={alt} />
+        </Modal>
+        
     )
 }

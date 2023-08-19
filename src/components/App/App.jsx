@@ -1,13 +1,16 @@
 import toast, { Toaster } from 'react-hot-toast';
 import { Component } from "react";
-import { GlobalStyle } from "./GlobalStyle";
-import { Searchbar } from "./Searchbar/Searchbar";
-import { Button } from "./Button/Button";
-import { fetchImages } from './API';
-import { ImageGallery } from './ImageGallery/ImageGallery';
-import { Loader } from './Loader/Loader';
+import { GlobalStyle } from "../GlobalStyle";
+import { Searchbar } from "../Searchbar/Searchbar";
+import { Button } from "../Button/Button";
+import { fetchImages } from '../API';
+import { ImageGallery } from '../ImageGallery/ImageGallery';
+import { Loader } from '../Loader/Loader';
+import { Wrapper } from './App.styled';
 
 const notify = () => toast.error("Please, enter your query")
+const notifyEnd = () => toast.error("Sorry, no more images for you :(")
+
 
 export class App extends Component {
   state = {
@@ -15,6 +18,7 @@ export class App extends Component {
     images: [],
     page: 1,
     loading: false,
+    totalHits: 0 
   }
   
   changeQuery = newQuery => {
@@ -25,7 +29,7 @@ export class App extends Component {
     this.setState({
       query: `${Date.now()}/${newQuery}`,
       images: [],
-      page: 1,
+      page: 1, 
     });
   };
 
@@ -38,8 +42,9 @@ export class App extends Component {
         this.setState({ loading: true });
         const imageItems = await fetchImages(querySlice, page);
         this.setState(prevState => ({
-          images: [...prevState.images, ...imageItems],
+          images: [...prevState.images, ...imageItems.hits],
           loading: false,
+          totalHits: imageItems.totalHits  
         }))
       } catch (error) {
         console.log(error)
@@ -52,16 +57,21 @@ export class App extends Component {
   }
 
   render() {
-    const {loading, images } = this.state
+    const { loading, images, page, totalHits } = this.state;
+    const totalPage = Math.ceil(totalHits / 12);
+  
+    if (page === totalPage) {
+      notifyEnd();
+    }
     return (
-      <>
+      <Wrapper>
         <Searchbar changeQuery={this.changeQuery} />
-        {loading ? (<Loader />) : (<ImageGallery images={this.state.images} />)}
+        {images.length > 0 && <ImageGallery images={this.state.images} />}
+        {loading && (<Loader />)}
         {images.length !== 0 && (<Button onButton={this.loadMore} />)}
         <Toaster />
         <GlobalStyle />
-      </>
-  )
-  }
-  
+      </Wrapper>
+    )
+  }  
 };
