@@ -10,6 +10,8 @@ import { Wrapper } from './App.styled';
 
 const notify = () => toast.error("Please, enter your query")
 const notifyEnd = () => toast.error("Sorry, no more images for you :(")
+const notifyNoImages = () => toast.error("Nothing found for your request :(")
+
 
 
 export class App extends Component {
@@ -18,7 +20,8 @@ export class App extends Component {
     images: [],
     page: 1,
     loading: false,
-    totalHits: 0 
+    totalHits: 0,
+    totalPage: 0
   }
   
   changeQuery = newQuery => {
@@ -41,10 +44,14 @@ export class App extends Component {
       try {
         this.setState({ loading: true });
         const imageItems = await fetchImages(querySlice, page);
+        if (!imageItems.hits.length) {
+          notifyNoImages();
+        }
         this.setState(prevState => ({
           images: [...prevState.images, ...imageItems.hits],
           loading: false,
-          totalHits: imageItems.totalHits  
+          totalHits: imageItems.totalHits,
+          totalPage: Math.ceil(imageItems.totalHits/12)
         }))
       } catch (error) {
         console.log(error)
@@ -53,23 +60,24 @@ export class App extends Component {
   }
 
   loadMore = () => {
+    if (this.state.page === this.state.totalPage) {
+      notifyEnd();
+      return
+    }
     this.setState(prevState => ({ page: prevState.page + 1 }))
+
   }
 
   render() {
-    const { loading, images, page, totalHits } = this.state;
-    const totalPage = Math.ceil(totalHits / 12);
-  
-    if (page === totalPage) {
-      notifyEnd();
-    }
+    const { loading, images } = this.state;
+
     return (
       <Wrapper>
         <Searchbar changeQuery={this.changeQuery} />
         {images.length > 0 && <ImageGallery images={this.state.images} />}
         {loading && (<Loader />)}
-        {images.length !== 0 && (<Button onButton={this.loadMore} />)}
-        <Toaster />
+        {images.length !== 0 && (<Button onButton={this.loadMore}  />)}
+        <Toaster position="top-right"/>
         <GlobalStyle />
       </Wrapper>
     )
