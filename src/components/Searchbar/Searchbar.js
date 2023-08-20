@@ -19,8 +19,6 @@ export const Searchbar = ({ changeQuery }) => {
                     <StyledInput
                         name="query"
                         type="text"
-                        // autocomplete="off"
-                        // autofocus
                         placeholder="Search images and photos"
                     />
                 </StyledForm>

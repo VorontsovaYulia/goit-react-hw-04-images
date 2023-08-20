@@ -8,11 +8,8 @@ import { ImageGallery } from '../ImageGallery/ImageGallery';
 import { Loader } from '../Loader/Loader';
 import { Wrapper } from './App.styled';
 
-const notify = () => toast.error("Please, enter your query")
-const notifyEnd = () => toast.error("Sorry, no more images for you :(")
-const notifyNoImages = () => toast.error("Nothing found for your request :(")
-
-
+const notify = () => toast.error("Please, enter your query");
+const notifyNoImages = () => toast.error("Nothing found for your request :(");
 
 export class App extends Component {
   state = {
@@ -21,18 +18,19 @@ export class App extends Component {
     page: 1,
     loading: false,
     totalHits: 0,
-    totalPage: 0
-  }
+    totalPage: 1
+  };
   
   changeQuery = newQuery => {
     if (newQuery === "") {
       return notify();
-    }
+    };
     
     this.setState({
       query: `${Date.now()}/${newQuery}`,
       images: [],
       page: 1, 
+      totalPage: 1
     });
   };
 
@@ -56,30 +54,25 @@ export class App extends Component {
       } catch (error) {
         console.log(error)
       } 
-    }
-  }
+    };
+  };
 
   loadMore = () => {
-    if (this.state.page === this.state.totalPage) {
-      notifyEnd();
-      return
-    }
     this.setState(prevState => ({ page: prevState.page + 1 }))
-
-  }
+  };
 
   render() {
-    const { loading, images } = this.state;
+    const { loading, images, page, totalPage } = this.state;
 
     return (
       <Wrapper>
         <Searchbar changeQuery={this.changeQuery} />
         {images.length > 0 && <ImageGallery images={this.state.images} />}
         {loading && (<Loader />)}
-        {images.length !== 0 && (<Button onButton={this.loadMore}  />)}
+        {page < totalPage && (<Button onButton={this.loadMore}  />)}
         <Toaster position="top-right"/>
         <GlobalStyle />
       </Wrapper>
     )
-  }  
+  }; 
 };
