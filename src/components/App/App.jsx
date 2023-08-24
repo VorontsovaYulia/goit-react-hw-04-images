@@ -1,5 +1,5 @@
 import toast, { Toaster } from 'react-hot-toast';
-import { Component } from "react";
+import { useEffect, useState } from "react";
 import { GlobalStyle } from "../GlobalStyle";
 import { Searchbar } from "../Searchbar/Searchbar";
 import { Button } from "../Button/Button";
@@ -11,68 +11,59 @@ import { Wrapper } from './App.styled';
 const notify = () => toast.error("Please, enter your query");
 const notifyNoImages = () => toast.error("Nothing found for your request :(");
 
-export class App extends Component {
-  state = {
-    query: "",
-    images: [],
-    page: 1,
-    loading: false,
-    totalHits: 0,
-    totalPage: 1
-  };
+export const App = () => {
+
+  const [query, setQuery] = useState('');
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [totalPage, setTotalPage] = useState(1);
   
-  changeQuery = newQuery => {
+  const changeQuery = newQuery => {
     if (newQuery === "") {
       return notify();
     };
     
-    this.setState({
-      query: `${Date.now()}/${newQuery}`,
-      images: [],
-      page: 1, 
-      totalPage: 1
-    });
-  };
+    setQuery(`${Date.now()}/${newQuery}`);
+    setImages([]);
+    setPage(1);
+    setTotalPage(1)
+  }
 
-  async componentDidUpdate(prevProps, prevState) {
-    const { query, page } = this.state;
-    
-    if (prevState.query !== query || prevState.page !== page) {
-      const querySlice = query.slice(query.indexOf("/") + 1);
+  useEffect(() => {
+    if (!query) return;
+    const querySlice = query.slice(query.indexOf("/") + 1);
+    async function getImages() {
       try {
-        this.setState({ loading: true });
+        setLoading(true);
         const imageItems = await fetchImages(querySlice, page);
         if (!imageItems.hits.length) {
           notifyNoImages();
         }
-        this.setState(prevState => ({
-          images: [...prevState.images, ...imageItems.hits],
-          loading: false,
-          totalHits: imageItems.totalHits,
-          totalPage: Math.ceil(imageItems.totalHits/12)
-        }))
+        setImages(prevState => [...prevState, ...imageItems.hits]);
+        setTotalPage(Math.ceil(imageItems.totalHits / 12));
       } catch (error) {
         console.log(error)
-      } 
+      } finally {
+        setLoading(false);
+      };
     };
-  };
+    getImages();
+  }, [query, page]);
 
-  loadMore = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }))
+  const loadMore = () => {
+    setPage(prevState => (prevState + 1))
   };
-
-  render() {
-    const { loading, images, page, totalPage } = this.state;
 
     return (
       <Wrapper>
-        <Searchbar changeQuery={this.changeQuery} />
-        {images.length > 0 && <ImageGallery images={this.state.images} />}
+        <Searchbar changeQuery={changeQuery} />
+        {images.length > 0 && <ImageGallery images={images} />}
         {loading && (<Loader />)}
-        {page < totalPage && (<Button onButton={this.loadMore}  />)}
+        {page < totalPage && (<Button onButton={loadMore}  />)}
         <Toaster position="top-right"/>
         <GlobalStyle />
       </Wrapper>
-    )
-  }; 
+    ) 
 };
+
